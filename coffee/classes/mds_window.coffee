@@ -169,7 +169,7 @@ module.exports = class MdsWindow
     saveAs: (triggers = {}) ->
       dialog.showSaveDialog @browserWindow,
         title: 'Save as...',
-        defaultPath: global.marp.config.get('lastPath'),
+        defaultPath: global.marp.config.get('lastPath') + '/' + @getCurrentFile(),
         filters: [{ name: 'Markdown file', extensions: ['md'] }]
       , (fname) =>
         if fname?
@@ -203,7 +203,7 @@ module.exports = class MdsWindow
       return if @freeze
       dialog.showSaveDialog @browserWindow,
         title: 'Export to PDF...'
-        defaultPath: global.marp.config.get('lastPath'),
+        defaultPath: global.marp.config.get('lastPath') + '/' + @getCurrentFile(),
         filters: [{ name: 'PDF file', extensions: ['pdf'] }]
       , (fname) =>
         return unless fname?
@@ -252,6 +252,10 @@ module.exports = class MdsWindow
   getShortPath: =>
     return '(untitled)' unless @path?
     @path.replace(/\\/g, '/').replace(/.*\//, '')
+
+  getCurrentFile: => 
+    return 'untitled' unless @path?
+    @path.replace(/\\/g, '/').replace(/.*\//, '').replace(/\.[^/.]+$/, "")
 
   updateResourceState: =>
     newState = if @_watchingResources.size <= 0 then 'loaded' else 'loading'
