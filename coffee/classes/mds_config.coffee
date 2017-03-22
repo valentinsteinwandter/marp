@@ -23,7 +23,6 @@ class MdsConfig
       width: 1000
       height: 420
       maximized: false
-    lastPath: ''
 
   constructor: ->
     return instance if instance?
