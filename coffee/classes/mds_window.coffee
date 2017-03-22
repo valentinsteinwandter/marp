@@ -4,6 +4,7 @@ MdsManager     = require './mds_manager'
 MdsMenu        = require './mds_menu'
 MdsMainMenu    = require './mds_main_menu'
 MdsFileHistory = require './mds_file_history'
+MdsConfig      = require './mds_config'
 extend         = require 'extend'
 fs             = require 'fs'
 jschardet      = require 'jschardet'
@@ -148,7 +149,8 @@ module.exports = class MdsWindow
       @trigger 'initializeState', path
       @send 'loadText', buffer
 
-    loadFromFile: (fname, options = {}) -> @loadFromFile fname, options
+    loadFromFile: (fname, options = {}) -> 
+      @loadFromFile fname, options
 
     reopen: (options = {}) ->
       return if @freeze or !@path
@@ -166,10 +168,12 @@ module.exports = class MdsWindow
 
     saveAs: (triggers = {}) ->
       dialog.showSaveDialog @browserWindow,
-        title: 'Save as...'
+        title: 'Save as...',
+        defaultPath: global.marp.config.get('lastPath'),
         filters: [{ name: 'Markdown file', extensions: ['md'] }]
       , (fname) =>
         if fname?
+          global.marp.config.set 'lastPath', Path.dirname(fname)
           @send 'save', fname, triggers
         else
           MdsWindow.appWillQuit = false
@@ -199,10 +203,12 @@ module.exports = class MdsWindow
       return if @freeze
       dialog.showSaveDialog @browserWindow,
         title: 'Export to PDF...'
+        defaultPath: global.marp.config.get('lastPath'),
         filters: [{ name: 'PDF file', extensions: ['pdf'] }]
       , (fname) =>
         return unless fname?
         @freeze = true
+        global.marp.config.set 'lastPath', Path.dirname(fname)
         @send 'publishPdf', fname
 
     initializeState: (filePath = null, changed = false) ->
